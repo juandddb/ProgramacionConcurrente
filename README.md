@@ -20,6 +20,6 @@ Abri R-Info y carga los códigos.
 
 Cualquier error que notes, podes abrir un **Pull Request**. Toda colaboración se agradece :)
 
-**Ante cualquier duda, pull request mensaje a mi perfil de GitHub.**
+**Ante cualquier duda, pull request o mensaje a mi perfil de GitHub.**
 
 
