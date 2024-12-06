@@ -1,0 +1,114 @@
+{Bienvenidos al entorno CMRE.
+Lo siguiente es un código de ejemplo que implementa un
+proceso que recibe un número de avenida como parámetro,
+se posiciona en esa avenida y la recorre.}
+
+programa ejemplo
+procesos
+  proceso tomarFlores(ES cant: numero)
+  comenzar
+    mientras (HayFlorEnLaEsquina)
+      tomarFlor
+      cant:=cant+1
+  fin
+  proceso HacerCuadrado(ES perimetro: numero ; ES flor: numero)
+  comenzar
+    repetir 4
+      repetir perimetro
+        tomarFlores(flor)
+        mover
+      derecha
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot Cliente
+  variables
+    tamanioLados: numero
+    id: numero
+    miAv,miCa: numero
+    cantF: numero
+    termine: boolean
+  comenzar
+    cantF:=0
+    miAv:=PosAv
+    miCa:=PosCa
+    tamanioLados:=0
+    RecibirMensaje(id, RS)
+
+    repetir 3
+      EnviarMensaje(id, RS)
+      EnviarMensaje(tamanioLados, RS)
+      RecibirMensaje(tamanioLados, RS)
+      HacerCuadrado(tamanioLados, cantF)
+      miCa:=PosCa
+      Pos(miAv, miCa+tamanioLados+1)
+    repetir cantF
+      BloquearEsquina(50,50)
+      Pos (50,50)
+      si (HayFlorEnLaBolsa)
+        depositarFlor
+      Pos(miAv,miCa)
+      LiberarEsquina(50,50)
+      termine:=V
+      EnviarMensaje(termine, RS)
+ 
+       
+  fin
+  
+  robot Servidor
+  variables
+    ladosAGenerar: numero
+    id: numero
+    flor: numero
+    termino: boolean
+    robotsListos: numero
+  comenzar
+    robotsListos:=0
+    EnviarMensaje(1, R1)
+    EnviarMensaje(2, R2)
+    EnviarMensaje(3, R3)
+    repetir 9
+      RecibirMensaje (id, *)
+      RecibirMensaje(ladosAGenerar, *)
+     
+      si (id = 1)
+        Random(ladosAGenerar, 1, 5) 
+        EnviarMensaje(ladosAGenerar, R1)
+        robotsListos:=robotsListos+1
+      sino 
+        si (id = 2)
+          Random(ladosAGenerar, 1, 5) 
+          EnviarMensaje(ladosAGenerar, R2)
+          robotsListos:=robotsListos+1
+        sino 
+          si (id = 3)
+            Random(ladosAGenerar, 1, 5) 
+            EnviarMensaje(ladosAGenerar, R3)
+            robotsListos:=robotsListos+1
+    RecibirMensaje(termino, *)
+    
+    si (termino = V & robotsListos =3)
+      BloquearEsquina(50,50)
+      mientras (HayFlorEnLaEsquina)
+        tomarFlor
+        flor:=flor+1
+      Informar(flor)
+     
+  fin
+variables
+  R1: Cliente
+  R2: Cliente
+  R3: Cliente
+  RS: Servidor
+comenzar
+  AsignarArea(R1, ciudad)
+  AsignarArea(R2, ciudad)
+  AsignarArea(R3, ciudad)
+  AsignarArea(RS, ciudad)
+  
+  Iniciar(R1, 1,1)
+  Iniciar(R2, 8,1)
+  Iniciar(R3, 15,1)
+  Iniciar(RS, 22,1)
+fin

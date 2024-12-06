@@ -1,0 +1,172 @@
+{Bienvenidos al entorno CMRE.
+Lo siguiente es un código de ejemplo que implementa un
+proceso que recibe un número de avenida como parámetro,
+se posiciona en esa avenida y la recorre.}
+
+programa ejemplo
+procesos
+  proceso tomarPapeles(ES c: numero) 
+  comenzar
+    mientras (HayPapelEnLaEsquina)
+      tomarPapel
+      c:=c+1
+  fin
+  proceso tomarFlores(ES c: numero) 
+  comenzar
+    mientras (HayFlorEnLaEsquina)
+      tomarFlor
+      c:=c+1
+  fin
+  proceso Trayecto2(ES cantP: numero)
+  comenzar
+    repetir 4
+      tomarPapeles(cantP)
+      mover
+  fin
+  proceso Trayecto1(ES cantF: numero)
+  comenzar
+
+    repetir 4
+      tomarFlores (cantF)
+      mover
+  fin
+areas
+  AreaRF: AreaP (1,6 ,1,6)
+  Area1R1: AreaP (1,7, 5,7)
+  Area1R2: AreaP (1,5, 5,5)
+  Area2R1: AreaP (7,5,11,5)
+  Area2R2: AreaP(7,7,11,7)
+  AreaDeCruce: AreaPC (6,6,6,6)
+robots
+  robot robot1
+  variables
+    quienSoy: numero
+    cantF: numero
+    cantP: numero
+  comenzar
+    cantF:=0
+    cantP:=0
+    RecibirMensaje(quienSoy, RF)
+    derecha
+    Trayecto1(cantF)
+    BloquearEsquina(6,6)
+    Pos (6,6)
+    tomarFlores(cantF)
+    Pos(7,5)
+    LiberarEsquina(6,6)
+    Trayecto1(cantF)
+    EnviarMensaje(quienSoy,RF)
+    EnviarMensaje(cantF,RF)
+    
+    repetir 2
+      derecha
+    Trayecto2(cantP)
+    BloquearEsquina(6,6)
+    Pos (6,6)
+    tomarPapeles(cantP)
+    Pos(5,7)
+    LiberarEsquina(6,6)
+    
+    Trayecto2(cantP)
+    EnviarMensaje(quienSoy,RF)
+    EnviarMensaje(cantP,RF)
+  fin
+  
+  robot robot2
+  variables
+    quienSoy: numero
+    cantF: numero
+    cantP: numero
+  comenzar
+    cantF:=0
+    cantP:=0
+    RecibirMensaje(quienSoy, RF)
+    derecha
+    Trayecto1(cantF)
+    BloquearEsquina(6,6)
+    Pos (6,6)
+    tomarFlores(cantF)
+    Pos(7,7)
+    LiberarEsquina(6,6)
+  
+    
+    Trayecto1(cantF)
+      
+    EnviarMensaje(quienSoy,RF)
+    EnviarMensaje(cantF,RF)
+    repetir 2
+      derecha
+    Trayecto2(cantP)
+    BloquearEsquina(6,6)
+    Pos (6,6)
+    tomarPapeles(cantP)
+    Pos(5,5)
+    LiberarEsquina(6,6)
+    Trayecto2(cantP)
+    EnviarMensaje(quienSoy,RF)
+    EnviarMensaje(cantP,RF)
+  fin
+  
+  robot fiscalizador
+  variables
+    id: numero
+    cantF, maxF, ganador: numero
+    listos, listosRP: numero
+    cantP, maxP, ganadorP: numero
+    
+  comenzar
+    EnviarMensaje(1, R1)
+    EnviarMensaje(2, R2)
+    maxF:=-1
+    maxP:=-1
+    listos:=0
+    listosRP:=0
+    repetir 2
+      RecibirMensaje(id, *)
+      si(id = 1)
+        RecibirMensaje(cantF, R1)
+        listos:=listos+1
+      sino
+        RecibirMensaje(cantF, R2)
+        listos:=listos+1
+    si (listos=2)
+      si (cantF>maxF)
+        maxF:=cantF    
+        ganador:=id
+    Informar(ganador)
+          
+          
+    repetir 2
+      RecibirMensaje(id, *)
+      si(id = 1)
+        RecibirMensaje(cantP, R1)
+        listosRP:=listosRP+1
+      sino
+        RecibirMensaje(cantP,R2)
+        listosRP:=listosRP+1
+        
+    si (listosRP=2)
+      si (cantP>maxP)         
+        maxP:=cantP
+        ganadorP:=id
+        Informar(ganadorP)
+    
+    
+  fin
+  
+variables
+  R1: robot1
+  R2: robot2
+  RF: fiscalizador
+comenzar
+  AsignarArea(RF, AreaRF)
+  AsignarArea(R1, Area1R1)
+  AsignarArea(R1, Area2R1)
+  AsignarArea(R2, Area1R2)
+  AsignarArea(R2, Area2R2)
+  AsignarArea(R1, AreaDeCruce)
+  AsignarArea(R2, AreaDeCruce)
+  Iniciar(RF, 1,6)
+  Iniciar(R1, 1,7)
+  Iniciar(R2, 1,5)
+fin

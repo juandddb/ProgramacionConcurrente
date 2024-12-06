@@ -1,0 +1,128 @@
+{Bienvenidos al entorno CMRE.
+Lo siguiente es un código de ejemplo que implementa un
+proceso que recibe un número de avenida como parámetro,
+se posiciona en esa avenida y la recorre.}
+
+programa ejemplo
+procesos
+  proceso tomarFlores(ES cantF: numero)
+  comenzar
+    mientras (HayFlorEnLaEsquina)
+      tomarFlor
+      cantF:=cantF+1
+  fin
+  
+  
+  proceso HacerRectangulo(E alto: numero ; E ancho: numero ; ES cantF: numero ; ES termine: boolean)
+  comenzar 
+    repetir 2
+     
+      repetir alto
+        tomarFlores(cantF)
+        mover
+        
+      derecha
+      repetir ancho
+        tomarFlores(cantF)
+        mover
+      derecha 
+    termine:=V
+  fin
+areas
+  areaR1: AreaP (1,1,6,11)
+  areaR2: AreaP (7,1,12,11)
+  areaR3: AreaP (13,1,18,11)
+  areaDeposito: AreaPC (25,25,25,25)
+  areaRC: AreaP (24,24,24,24)
+robots
+  robot Recolector
+  variables
+    cantF: numero
+    quienSoy: numero
+    alto, ancho: numero
+    termine: boolean
+    miAv, miCa: numero
+  comenzar
+    miAv:=PosAv
+    miCa:=PosCa
+    cantF:=0
+    RecibirMensaje(quienSoy, RC)
+    EnviarMensaje(quienSoy, RC)
+    RecibirMensaje(alto, RC)
+    RecibirMensaje(ancho, RC)
+
+    HacerRectangulo(alto, ancho, cantF, termine)
+    si (termine = V)
+      EnviarMensaje(cantF, RC)
+      repetir cantF
+        BloquearEsquina(25,25)
+        Pos(25,25)
+        si (HayFlorEnLaBolsa) {se confundio el tranza}
+          depositarFlor
+        Pos(miAv,miCa)
+        LiberarEsquina(25,25)
+
+  fin
+  robot Coordinador
+  variables
+    id: numero
+    alto,ancho: numero
+    cantF, cantMax, idGanador: numero
+  comenzar
+    cantMax:=-1
+    EnviarMensaje(1, R1)
+    EnviarMensaje(2, R2)
+    EnviarMensaje(3, R3)
+   
+  
+    Random(alto, 1, 10)
+    Random(ancho, 1,5)
+    EnviarMensaje(alto, R1)
+    EnviarMensaje(ancho, R1)
+    Random(alto, 1, 10)
+    Random(ancho, 1,5)
+    EnviarMensaje(alto, R2)
+    EnviarMensaje(ancho, R2)
+    Random(alto, 1, 10)
+    Random(ancho, 1,5)
+    EnviarMensaje(alto, R3)
+    EnviarMensaje(ancho, R3)
+
+
+    repetir 3
+      RecibirMensaje(id, *)
+      si (id = 1)
+        RecibirMensaje(cantF, R1)
+      sino
+        si (id = 2)
+          RecibirMensaje(cantF, R2)
+        sino
+          si (id = 3)
+            RecibirMensaje(cantF, R3)
+            
+        si (cantF>cantMax)
+          cantMax:=cantF
+          idGanador:=id
+        Informar(idGanador)
+      
+  fin
+  
+variables
+  R1: Recolector
+  R2: Recolector
+  R3: Recolector
+  RC: Coordinador
+comenzar
+  AsignarArea(R1, areaR1)
+  AsignarArea(R2, areaR2)
+  AsignarArea(R3, areaR3)
+  AsignarArea(RC, areaRC)
+  
+  AsignarArea(R1, areaDeposito)
+  AsignarArea(R2, areaDeposito)
+  AsignarArea(R3, areaDeposito)
+  Iniciar(RC, 24,24)
+  Iniciar(R1, 1,1)
+  Iniciar(R2, 7,1)
+  Iniciar(R3, 13,1)
+fin

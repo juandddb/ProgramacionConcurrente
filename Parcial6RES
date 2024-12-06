@@ -1,0 +1,141 @@
+{Bienvenidos al entorno CMRE.
+Lo siguiente es un código de ejemplo que implementa un
+proceso que recibe un número de avenida como parámetro,
+se posiciona en esa avenida y la recorre.}
+
+programa ejemplo
+procesos
+  proceso SoltarCosas(ES f: numero ; ES p: numero)
+  comenzar
+    mientras(HayPapelEnLaBolsa)
+      depositarPapel
+    mientras(HayFlorEnLaBolsa)
+      depositarFlor
+  fin
+  proceso JuntarCosas(ES cantF: numero ; ES cantP: numero)
+  comenzar
+    mientras (HayFlorEnLaEsquina)
+      tomarFlor
+      cantF:=cantF+1
+    mientras (HayPapelEnLaEsquina)
+      tomarPapel
+      cantP:=cantP+1
+  fin
+  proceso recorrerAvenida(ES cantF: numero ; ES cantP: numero)
+  comenzar
+    repetir 99
+      JuntarCosas(cantF,cantP)
+      mover
+      JuntarCosas(cantF,cantP)
+  fin
+areas
+  areaTrabajoR1: AreaP (4,1,7,100)
+  areaTrabajoR2: AreaP (8,1,11,100)
+  areaDeposito: AreaPC(20,1,20,100)
+  areaRC: AreaP(1,1,1,1)
+robots
+  robot juntador
+  variables
+    cantP, cantF: numero
+    miAv,miCa: numero
+    quienSoy: numero
+    calleazar: numero
+    cantEsquinasTrabajadas: numero
+    termine: boolean
+    total: numero
+  comenzar
+    cantEsquinasTrabajadas:= 0
+    RecibirMensaje(quienSoy, RC)
+
+   
+    repetir 4
+      miAv:= PosAv
+      miCa:= PosCa
+   
+      cantF:= 0
+      cantP:= 0
+      total:=0
+      recorrerAvenida(cantF, cantP) {recorro juntando p y f}
+      EnviarMensaje(quienSoy, RC)
+      EnviarMensaje(cantP, RC)
+      EnviarMensaje(cantF, RC)
+      RecibirMensaje(calleazar, RC)
+      BloquearEsquina(20, calleazar)
+      Pos(20, calleazar)
+      SoltarCosas(cantF,cantP)
+      cantEsquinasTrabajadas:=cantEsquinasTrabajadas+1
+      si (cantEsquinasTrabajadas <>4)
+        Pos(miAv+1, miCa) 
+      sino 
+        Pos(miAv,miCa)
+      LiberarEsquina(20,calleazar)        
+      
+    
+       
+     
+    
+  fin
+  robot coordinador
+  variables 
+    callerandom: numero
+    cantF, cantP: numero
+    id: numero
+    total: numero
+    totalR1, totalR2: numero
+    ganador: numero
+  comenzar
+    ganador:=0
+    EnviarMensaje(1, R1)
+    EnviarMensaje(2, R2)
+    repetir 8
+      Random(callerandom, 1,99)
+      RecibirMensaje(id, *)
+      si (id = 1)
+        RecibirMensaje(cantF,R1)
+        RecibirMensaje(cantP,R1)
+        totalR1:=cantF+cantP
+        EnviarMensaje(callerandom, R1)
+      
+      sino
+        RecibirMensaje(cantF,R2)
+        RecibirMensaje(cantP,R2)
+        totalR2:=cantF+cantP
+        EnviarMensaje(callerandom, R2)
+      
+      si (totalR1>totalR2)
+        ganador:=id
+      sino
+        ganador:=id
+        
+        
+    
+    Pos(20,1)
+    recorrerAvenida (cantF, cantP)
+    Informar("junto mas flores el R", ganador)
+    
+
+
+        
+  
+       
+        
+        
+     
+     
+  fin
+variables
+  R1: juntador
+  R2: juntador
+  RC: coordinador
+comenzar
+  AsignarArea(R1, areaTrabajoR1)
+  AsignarArea(R2, areaTrabajoR2)
+  AsignarArea(R1, areaDeposito)
+  AsignarArea(R2, areaDeposito)
+  AsignarArea(RC, areaRC)
+  AsignarArea(RC, areaDeposito)
+  Iniciar(RC, 1,1)
+  Iniciar(R1, 4,1)
+  Iniciar(R2, 8,1)
+
+fin

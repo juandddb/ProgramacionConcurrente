@@ -1,0 +1,121 @@
+{Bienvenidos al entorno CMRE.
+Lo siguiente es un código de ejemplo que implementa un
+proceso que recibe un número de avenida como parámetro,
+se posiciona en esa avenida y la recorre.}
+
+programa ejemplo
+procesos
+  proceso BuscarFlor(E numAv: numero ; E numCa: numero ; ES encontre: boolean)
+  comenzar
+    Pos(numAv, numCa)
+    si (HayFlorEnLaEsquina)
+      tomarFlor
+      encontre:=V
+  fin
+  
+areas
+  areaInicioR1: AreaP(1,1,1,1)
+  areaInicioR2: AreaP(2,2,2,2)
+  areaInicioR3: AreaP(3,3,3,3)
+  areaInicioRE: AreaP(4,4,4,4)
+  areaEscondite: AreaC (10,10,13,13)
+  
+robots
+  robot Escondedor
+  variables
+    id: numero
+    calle, avenida: numero
+    miAv, miCa: numero
+    ganador: numero
+    termino, encontre: boolean
+  comenzar
+    miAv:=PosAv
+    miCa:=PosCa
+    
+    Random(avenida,10,13)
+    Random(calle,10,13) 
+  
+    Pos(avenida,calle)
+    depositarFlor
+    Pos(miAv,miCa)
+    
+    EnviarMensaje(1, R1)
+    EnviarMensaje(2, R2)
+    EnviarMensaje(3, R3)
+    repetir 3
+      RecibirMensaje(id, *)
+      RecibirMensaje(encontre, *)
+    
+      si (id = 1) & (encontre = V)
+        ganador:=id
+      sino
+        si (id = 2) & (encontre = V)
+          ganador:= id
+        sino
+          si (id = 3) & (encontre = V)
+            ganador := id 
+       
+       
+   
+    termino:=V 
+    EnviarMensaje(termino, R1)
+    EnviarMensaje(termino, R2)
+    EnviarMensaje(termino, R3)
+    Informar(ganador)
+      
+    
+  fin
+  
+  robot Buscador
+  variables
+    quienSoy: numero
+    calle, avenida: numero
+    encontre, terminar: boolean
+    miAv, miCa: numero
+  comenzar
+    encontre:= F
+    terminar:= F
+    miAv:=PosAv
+    miCa:=PosCa
+    RecibirMensaje(quienSoy, REscondedor)
+    
+    mientras(encontre <> V) & (terminar = F)
+      Random(calle, 10, 13)
+      Random(avenida, 10,13)
+      BloquearEsquina(avenida,calle)          
+      BuscarFlor(calle,avenida, encontre)
+      Pos(miAv,miCa)
+      LiberarEsquina(avenida,calle)
+      EnviarMensaje(quienSoy, REscondedor)
+      EnviarMensaje(encontre, REscondedor)
+      RecibirMensaje(terminar, REscondedor)
+  
+      
+    
+  fin
+    
+variables
+  REscondedor: Escondedor
+  R1: Buscador
+  R2: Buscador
+  R3: Buscador
+
+  
+  
+comenzar
+  AsignarArea(REscondedor, areaEscondite)
+  AsignarArea(R1, areaEscondite)
+  AsignarArea(R2, areaEscondite)
+  AsignarArea(R3, areaEscondite)
+  AsignarArea(REscondedor, areaInicioRE)
+  AsignarArea(R1, areaInicioR1)
+  AsignarArea(R2, areaInicioR2)
+  AsignarArea(R3, areaInicioR3)
+  
+  
+  
+  Iniciar(R1, 1,1)
+  Iniciar(R2, 2,2)
+  Iniciar(R3, 3,3)
+  Iniciar(REscondedor, 4,4)
+fin
